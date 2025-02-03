@@ -5,6 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 // קריאת משתנה הסביבה או שימוש בערך ברירת המחדל מ-appsettings.json
 // var connectionString = Environment.GetEnvironmentVariable("ToDoDB") 
 //                        ?? builder.Configuration.GetConnectionString("ToDoDB");
+//הזרקת מחקת דיבי קונטקס לשימוש מול הדאטה בייס 
+// builder.Services.AddDbContext<ToDoDbContext>(options =>
+//     options.UseMySql("server=localhost;user=root;password=mstehila920;database=tododb",
+//         Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.41-mysql")));
 //הרשאות כדי שיוכלו לתקשר עם השרת
 builder.Services.AddCors(options =>
 {
@@ -15,10 +19,11 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader(); // כל כותרת
     });
 });
-//הזרקת מחקת דיבי קונטקס לשימוש מול הדאטה בייס 
+var connectionString = Environment.GetEnvironmentVariable("ToDoDB");
+
 builder.Services.AddDbContext<ToDoDbContext>(options =>
-    options.UseMySql("server=localhost;user=root;password=mstehila920;database=tododb",
-        Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.41-mysql")));
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
