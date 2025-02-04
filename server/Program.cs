@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using server;  
 var builder = WebApplication.CreateBuilder(args);
 // קריאת משתנה הסביבה או שימוש בערך ברירת המחדל מ-appsettings.json
@@ -20,11 +21,24 @@ builder.Services.AddCors(options =>
     });
 });
 
+// var connectionString = builder.Configuration.GetConnectionString("ToDoDB");
+// builder.Services.AddDbContext<ToDoDbContext>(options =>
+//     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+// );
 var connectionString = builder.Configuration.GetConnectionString("ToDoDB");
-builder.Services.AddDbContext<ToDoDbContext>(options =>
+try
+{
+    using var connection = new MySqlConnection(connectionString);
+    connection.Open();
+    builder.Services.AddDbContext<ToDoDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
-
+    Console.WriteLine("✅ Connected to database successfully!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"❌ Database connection failed: {ex.Message}");
+}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
