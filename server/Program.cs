@@ -21,24 +21,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// var connectionString = builder.Configuration.GetConnectionString("ToDoDB");
-// builder.Services.AddDbContext<ToDoDbContext>(options =>
-//     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-// );
 var connectionString = builder.Configuration.GetConnectionString("ToDoDB");
-try
-{
-    using var connection = new MySqlConnection(connectionString);
-    connection.Open();
-    builder.Services.AddDbContext<ToDoDbContext>(options =>
+// Console.WriteLine();
+System.Console.WriteLine($"Connection String: {connectionString}");
+builder.Services.AddDbContext<ToDoDbContext>(options =>
+
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
-    Console.WriteLine("✅ Connected to database successfully!");
-}
-catch (Exception ex)
-{
-    Console.WriteLine($"❌ Database connection failed: {ex.Message}");
-}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -67,12 +56,12 @@ app.MapGet("/items/{id}", (int id, ToDoDbContext context) =>
 });
 //הוספה
 app.MapPost("/items", ([FromBody] Item item,
-                       [FromHeader(Name = "X-Request-ID")] string requestId,
+                       
                        ToDoDbContext context) =>
 {
     context.Items.Add(item);  // ה-id יינתן אוטומטית
     context.SaveChanges();  // ה-id יתעדכן אוטומטית במסד
-    return Results.Created($"/items/{item.Id}", new { item, requestId });
+    return Results.Created($"/items/{item.Id}", new { item, item.Id });
 });
 // עדכון משימה לפי ID
 app.MapPut("/items/{id}", (int id, [FromBody] Item updatedItem, ToDoDbContext context) =>
