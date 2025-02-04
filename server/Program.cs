@@ -19,11 +19,13 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader(); // כל כותרת
     });
 });
-var connectionString = Environment.GetEnvironmentVariable("ToDoDB");
 
+var connectionString = builder.Configuration.GetConnectionString("ToDoDB");
 builder.Services.AddDbContext<ToDoDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-    
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+);
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
