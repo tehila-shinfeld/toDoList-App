@@ -62,9 +62,14 @@ export default {
 
   setCompleted: async (id, isComplete) => {
     console.log('setCompleted', { id, isComplete });
-    const updatedTask = { isComplete};
+    // משיכת המשימה הנוכחית לפני עדכון
+    const existingTask = await api.get(`/items/${id}`);
+    const updatedTask = { 
+      name: existingTask.data.name, // שמירה על השם הקיים
+      isComplete 
+    };
     await api.put(`/items/${id}`, updatedTask);
-    return { id, isComplete };
+    return updatedTask;
   },
 
   deleteTask: async (id) => {

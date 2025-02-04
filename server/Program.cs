@@ -64,12 +64,13 @@ app.MapPost("/items", ([FromBody] Item item,
     return Results.Created($"/items/{item.Id}", new { item, item.Id });
 });
 // עדכון משימה לפי ID
+
 app.MapPut("/items/{id}", (int id, [FromBody] Item updatedItem, ToDoDbContext context) =>
 {
     var item = context.Items.Find(id);
     if (item is null) return Results.NotFound();
 
-    item.Name = updatedItem.Name;
+    item.Name = string.IsNullOrEmpty(updatedItem.Name) ? item.Name : updatedItem.Name;
     item.IsComplete = updatedItem.IsComplete;
     context.SaveChanges();
 
